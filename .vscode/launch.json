@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Only Monitor 3 - switch-display.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/switch-display.ps1",
+            "args": ["-OnlyMonitor3"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Undo - switch-display.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/switch-display.ps1",
+            "args": ["-Undo"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Print Only Monitor 3 - switch-display.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/switch-display.ps1",
+            "args": ["-Print", "-OnlyMonitor3"],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

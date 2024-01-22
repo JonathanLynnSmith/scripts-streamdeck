@@ -1,0 +1,3 @@
+# scripts-streamdeck
+
+The Stream Deck, developed by Elgato, is a versatile hardware control surface designed for content creators and streamers. Featuring a grid of customizable buttons with LCD screens, it provides a seamless and efficient way to control software applications and streamline tasks during live streaming and video production. Users can assign functions, macros, and shortcuts to the buttons, allowing for quick access to essential controls like scene switching, audio adjustment, application launching, and more. Elevate your content creation workflow with the Stream Deck's intuitive and customizable interface.
