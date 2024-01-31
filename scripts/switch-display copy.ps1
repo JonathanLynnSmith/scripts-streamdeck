@@ -1,9 +1,9 @@
 param (
     [switch]$OpenTool,
     [switch]$Undo,
-    [switch]$OnlyMonitor3
+    [switch]$HD,
+    [switch]$QHD
 )
-
 
 function GenerateMonitorConfig {
     param (
@@ -31,7 +31,6 @@ function GenerateMonitorConfig {
     return $config
 }
 
-$MaxEnableAllRange = 3
 $resourcesPath = "$PSScriptRoot\..\resources\"
 $monitorToolPath = "$resourcesPath\MultiMonitorTool\MultiMonitorTool.exe"
 
@@ -40,58 +39,20 @@ $lenovoMonitorId = "MONITOR\LEN61AF\{4d36e96e-e325-11ce-bfc1-08002be10318}\0001"
 $dellMonitorId = "MONITOR\DELA0B5\{4d36e96e-e325-11ce-bfc1-08002be10318}\0003"
 
 $lgDefaultConfig = GenerateMonitorConfig -Name $lgMonitorId -Primary -BitsPerPixel 32 -Width 3440 -Height 1440 -DisplayFrequency 144 -PositionX 0 -PositionY 0
+$lgHDConfig = GenerateMonitorConfig -Name $lgMonitorId -Primary -BitsPerPixel 32 -Width 1920 -Height 1080 -DisplayFrequency 144 -PositionX 0 -PositionY 0
+$lgQHDConfig = GenerateMonitorConfig -Name $lgMonitorId -Primary -BitsPerPixel 32 -Width 2560 -Height 1440 -DisplayFrequency 144 -PositionX 0 -PositionY 0
+
 $lenovoDefaultConfig = GenerateMonitorConfig -Name $lenovoMonitorId -BitsPerPixel 32 -Width 1440 -Height 2560 -DisplayFrequency 59 -DisplayOrientation 1 -PositionX -1440 -PositionY 0
+$lenovoDisableConfig = GenerateMonitorConfig -Name $lenovoMonitorId -Primary -BitsPerPixel 32 -Width 0 -Height 0 -DisplayFrequency 60 -PositionX 0 -PositionY 0
+
 $dellDefaultConfig = GenerateMonitorConfig -Name $dellMonitorId -BitsPerPixel 32 -Width 1920 -Height 1080 -DisplayFrequency 60 -PositionX 3440 -PositionY 349
-
-
-function Main{
-    if ($OpenTool) {
-        OpenMonitorTool
-    }
-    elseif ($OnlyMonitor3) {
-        DisableMonitors -MonitorIds $lenovoMonitorId, $lgMonitorId
-    }
-    elseif ($Undo) {
-        EnableAllMonitors
-        SetMonitors -Configs $dellDefaultConfig, $lenovoDefaultConfig, $lgDefaultConfig
-    }
-    else {
-        Write-Host "Invalid Action"
-    }
-}
-
-function DisableMonitors {
-    param (
-        [string[]]$MonitorIds
-    )
-
-    Write-Host "Disabling Monitor(s)"
-    $quotedConfigs = $MonitorIds | ForEach-Object { "`"$_`"" }
-    RunCommand -Command "$monitorToolPath /disable $quotedConfigs"
-}
-
-function EnableMonitors {
-    param (
-        [string[]]$MonitorIds
-    )
-    Write-Host "Enabling Monitor(s)"
-    $quotedConfigs = $MonitorIds | ForEach-Object { "`"$_`"" }
-    RunCommand -Command "$monitorToolPath /enable $quotedConfigs"
-}
-
-function EnableAllMonitors {
-    $allMonitorIDS = @()
-    for ($i = 1; $i -lt $MaxEnableAllRange -or $i -eq $MaxEnableAllRange; $i++) {
-        $allMonitorIDS += "\\.\DISPLAY$i"
-    }
-    EnableMonitors -MonitorIds $allMonitorIDS
-}
+$dellDisableConfig = GenerateMonitorConfig -Name $dellMonitorId -Primary -BitsPerPixel 32 -Width 0 -Height 0 -DisplayFrequency 60 -PositionX 0 -PositionY 0
 
 function SetMonitors {
     param (
         [string[]]$Configs
     )
-    Write-Host "Setting Monitor Configuration"
+
     $quotedConfigs = $Configs | ForEach-Object { "`"$_`"" }
     RunCommand -Command "$monitorToolPath /SetMonitors $quotedConfigs"
 }
@@ -104,14 +65,25 @@ function RunCommand {
     param (
         [string]$Command
     )
-    Write-Host "--------------------
---> $Command
-"
 
+    Write-Host $Command
     Invoke-Expression $Command
     Start-Sleep 1
     Invoke-Expression $Command
 }
 
-Write-Host ""
-Main
+if ($OpenTool) {
+    OpenMonitorTool
+}
+elseif ($QHD) {
+    SetMonitors -Configs $lgQHDConfig, $lenovoDisableConfig, $dellDisableConfig
+}
+elseif ($HD) {
+    SetMonitors -Configs $lgHDConfig, $disableConfig, $disableConfig
+}
+elseif ($Undo) {
+    SetMonitors -Configs $lgDefaultConfig, $lenovoDefaultConfig, $dellDefaultConfig
+}
+else {
+    Write-Host "Invalid Action"
+}
